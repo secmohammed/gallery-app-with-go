@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func handleRequests(w http.ResponseWriter, r *http.Request) {
@@ -18,10 +20,14 @@ func handleRequests(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	fmt.Fprint(w, "Welcome!\n")
+}
+
 func main() {
-	mux := &http.ServeMux{}
-	mux.HandleFunc("/", handleRequests)
-	// runs at all available methods.
+	router := httprouter.New()
+	router.GET("/", Index)
 	// http.HandleFunc("/", handleRequests)
-	http.ListenAndServe(":3000", mux)
+	http.ListenAndServe(":3000", router)
 }
