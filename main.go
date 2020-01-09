@@ -12,6 +12,9 @@ func handleRequests(w http.ResponseWriter, r *http.Request) {
 
 	} else if r.URL.Path == "/contact" {
 		fmt.Fprint(w, "welcome to the contact page.")
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "Page 404 couldn't be found.")
 	}
 }
 
