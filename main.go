@@ -7,22 +7,28 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func handleRequests(w http.ResponseWriter, r *http.Request) {
+func home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	if r.URL.Path == "/" {
-		fmt.Fprint(w, "Welcome to my awesome site.")
+	fmt.Fprint(w, "<h1> Hello, we are at homepage </h1>")
 
-	} else if r.URL.Path == "/contact" {
-		fmt.Fprint(w, "welcome to the contact page.")
-	} else {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "Page 404 couldn't be found.")
-	}
 }
-
+func handleContactRequest(response http.ResponseWriter, request *http.Request) {
+	fmt.Fprint(response, "Welcome to the contact page.")
+}
+func handleFAQRequest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	fmt.Fprint(w, "This is the FAQ Page.")
+}
+func customNotFoundPage(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	w.Header().Set("Content-Type", "text/html")
+	fmt.Fprint(w, "Sorry, but we couldn't find the page you are looking for.")
+}
 func main() {
 	router := mux.NewRouter()
-	router.HandleFunc("/", handleRequests)
-	// http.HandleFunc("/", handleRequests)
+	router.NotFoundHandler = http.HandlerFunc(customNotFoundPage)
+	router.HandleFunc("/", home)
+	router.HandleFunc("/faq", handleFAQRequest)
+	router.HandleFunc("/contact", handleContactRequest)
 	http.ListenAndServe(":3000", router)
 }
