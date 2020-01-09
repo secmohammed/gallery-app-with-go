@@ -7,8 +7,12 @@ import (
 
 func handleRequests(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprint(w, "Welcome to my badddd site.")
+	if r.URL.Path == "/" {
+		fmt.Fprint(w, "Welcome to my awesome site.")
 
+	} else if r.URL.Path == "/contact" {
+		fmt.Fprint(w, "welcome to the contact page.")
+	}
 }
 
 func main() {
