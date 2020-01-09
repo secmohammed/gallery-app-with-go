@@ -19,7 +19,9 @@ func handleRequests(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	mux := &http.ServeMux{}
+	mux.HandleFunc("/", handleRequests)
 	// runs at all available methods.
-	http.HandleFunc("/", handleRequests)
-	http.ListenAndServe(":3000", nil)
+	// http.HandleFunc("/", handleRequests)
+	http.ListenAndServe(":3000", mux)
 }
