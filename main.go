@@ -13,6 +13,7 @@ import (
 var (
 	homeView    *views.View
 	contactView *views.View
+	signupView  *views.View
 )
 
 func handleHomeRequest(w http.ResponseWriter, r *http.Request) {
@@ -22,6 +23,13 @@ func handleHomeRequest(w http.ResponseWriter, r *http.Request) {
 func handleContactRequest(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "text/html")
 	must(contactView.Render(response, nil))
+}
+func handleSignupRequest(response http.ResponseWriter, request *http.Request) {
+	response.Header().Set("Content-Type", "text/html")
+	must(signupView.Render(response, nil))
+}
+func handleRegisterFormSubmission(response http.ResponseWriter, request *http.Request) {
+	fmt.Println(request.PostFormValue("email"))
 }
 func handleFAQRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -46,10 +54,13 @@ func main() {
 		"layout",
 		"views/contact.gohtml",
 	)
+	signupView = views.NewView("layout", "views/signup.gohtml")
 	router := mux.NewRouter()
 	router.NotFoundHandler = http.HandlerFunc(customNotFoundPage)
 	router.HandleFunc("/", handleHomeRequest)
+	router.HandleFunc("/register", handleRegisterFormSubmission).Methods("POST")
 	router.HandleFunc("/faq", handleFAQRequest)
 	router.HandleFunc("/contact", handleContactRequest)
+	router.HandleFunc("/register", handleSignupRequest)
 	http.ListenAndServe(":3000", router)
 }
