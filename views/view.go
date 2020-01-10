@@ -2,6 +2,7 @@ package views
 
 import (
     "html/template"
+    "net/http"
     "path/filepath"
 )
 
@@ -25,6 +26,11 @@ func NewView(layout string, files ...string) *View {
         Template: t,
         Layout:   layout,
     }
+}
+
+// Render function to render the recently created views.
+func (v *View) Render(response http.ResponseWriter, data interface{}) error {
+    return v.Template.ExecuteTemplate(response, v.Layout, data)
 }
 
 // View struct, to create a new object file and parse the view files.

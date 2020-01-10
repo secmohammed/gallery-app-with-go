@@ -17,21 +17,11 @@ var (
 
 func handleHomeRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	err := homeView.Template.ExecuteTemplate(w, homeView.Layout, nil)
-	// panic only when executing the template has an error that's not null.
-	if err != nil {
-		panic(err)
-	}
-
+	must(homeView.Render(w, nil))
 }
 func handleContactRequest(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "text/html")
-	err := contactView.Template.ExecuteTemplate(response, contactView.Layout, nil)
-
-	if err != nil {
-		panic(err)
-	}
-
+	must(contactView.Render(response, nil))
 }
 func handleFAQRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -41,6 +31,11 @@ func customNotFoundPage(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprint(w, "Sorry, but we couldn't find the page you are looking for.")
+}
+func must(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
 func main() {
 	homeView = views.NewView(
