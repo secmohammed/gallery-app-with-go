@@ -1,6 +1,7 @@
 package controllers
 
 import (
+    "fmt"
     "net/http"
 
     "lenslocked.com/resources/views"
@@ -13,6 +14,11 @@ func ShowRegisterForm() *Users {
     }
 }
 
+//ParseRegisterForm to parse the registration form when submitted.
+func ParseRegisterForm(w http.ResponseWriter, r *http.Request) {
+    fmt.Println(r.PostFormValue("email"))
+}
+
 // Users type.
 type Users struct {
     NewView *views.View
@@ -20,6 +26,5 @@ type Users struct {
 
 // Render Method to render the parsed view.
 func (u *Users) Render(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "text/html")
     u.NewView.Render(w, nil)
 }
