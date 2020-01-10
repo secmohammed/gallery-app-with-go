@@ -7,7 +7,7 @@ _obj
 _test
 
 # Architecture specific extensions/prefixes
-/tmp
+**/tmp/*
 *.cgo1.go
 *.cgo.c
 *.exe
