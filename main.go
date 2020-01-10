@@ -40,13 +40,20 @@ func customNotFoundPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Sorry, but we couldn't find the page you are looking for.")
 }
 func main() {
+
 	var err error
 	// we don't use :=, to assign it to the the first global variable we created.
-	homeTemplate, err = template.ParseFiles("views/home.gohtml")
+	homeTemplate, err = template.ParseFiles(
+		"views/home.gohtml",
+		"views/layouts/footer.gohtml",
+	)
 	if err != nil {
 		panic(err)
 	}
-	contactTemplate, err = template.ParseFiles("views/contact.gohtml")
+	contactTemplate, err = template.ParseFiles(
+		"views/contact.gohtml",
+		"views/layouts/footer.gohtml",
+	)
 	if err != nil {
 		panic(err)
 	}
