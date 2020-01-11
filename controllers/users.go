@@ -4,8 +4,8 @@ import (
     "fmt"
     "net/http"
 
-    "github.com/gorilla/schema"
     "lenslocked.com/resources/views"
+    "lenslocked.com/utils"
 )
 
 // ShowRegisterForm function to show the form
@@ -23,16 +23,9 @@ type RegisterFormRequest struct {
 
 //ParseRegisterForm to parse the registration form when submitted.
 func ParseRegisterForm(w http.ResponseWriter, r *http.Request) {
-    // parseForm must be called in order to fill the postForm with the data coming from the input form data.
-    if err := r.ParseForm(); err != nil {
-        panic(err)
-    }
-    decoder := schema.NewDecoder()
     var form RegisterFormRequest
 
-    if err := decoder.Decode(&form, r.PostForm); err != nil {
-        panic(err)
-    }
+    utils.Must(utils.ParseForm(r, &form))
     fmt.Fprintln(w, form)
 }
 
