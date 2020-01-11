@@ -14,7 +14,7 @@ var (
 
 // NewView function to create a new view by parsing passed templates.
 // when function is first letter uppercase it's already exported, if we don't want to export it, we name it normally.
-func NewView(layout string, files ...string) *View {
+func NewView(files ...string) *View {
 
     files = append(
         addTemplateExtensionToFile(addTemplatePath(files)),
@@ -27,7 +27,8 @@ func NewView(layout string, files ...string) *View {
     }
     return &View{
         Template: t,
-        Layout:   layout,
+        // render the layout template we have at our master.gohtml
+        Layout: "layout",
     }
 }
 
