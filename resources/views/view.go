@@ -1,7 +1,6 @@
 package views
 
 import (
-    "fmt"
     "html/template"
     "net/http"
     "path/filepath"
@@ -17,11 +16,8 @@ var (
 // when function is first letter uppercase it's already exported, if we don't want to export it, we name it normally.
 func NewView(layout string, files ...string) *View {
 
-    addTemplatePath(files)
-    fmt.Println(files)
-    addTemplateExtensionToFile(files)
     files = append(
-        files,
+        addTemplateExtensionToFile(addTemplatePath(files)),
         layoutFiles(layoutDir)...,
     )
 
@@ -60,16 +56,18 @@ func layoutFiles(layoutDir string) []string {
 //  and it prepends the TemplateDir directory to each string in the slice
 //  Eg: the input {"home"} would be result in the output
 //  {"resources/views/home"}  if TemplateDir == "resources/views"
-func addTemplatePath(files []string) {
+func addTemplatePath(files []string) []string {
     for i, f := range files {
         files[i] = templateDir + f
     }
+    return files
 }
 
 // addTemplateExtensionToFile takes a slice of strings representing files for templates,
 // and it appends to the file the extension that's assigned to templateExtension.
-func addTemplateExtensionToFile(files []string) {
+func addTemplateExtensionToFile(files []string) []string {
     for i, f := range files {
         files[i] = f + templateExtension
     }
+    return files
 }
