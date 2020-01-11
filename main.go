@@ -1,44 +1,21 @@
 package main
 
 import (
-	"fmt"
 	"log"
-
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	// load dotenv variables
 	_ "github.com/joho/godotenv/autoload"
-	"lenslocked.com/config"
+	// load migrations
+	_ "lenslocked.com/migrations"
+	"lenslocked.com/models"
 	"lenslocked.com/routes"
+	"lenslocked.com/utils"
+	_ "lenslocked.com/utils"
 )
 
-var databaseCredentials = config.GetDatabase()
-
-// User type
-type User struct {
-	ID    int
-	Name  string
-	Email string `gorm:"type:varchar(100);unique_index"`
-}
-
 func main() {
-
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		databaseCredentials["host"],
-		databaseCredentials["port"],
-		databaseCredentials["username"],
-		databaseCredentials["password"],
-		databaseCredentials["database"],
-	)
-	db, err := gorm.Open("postgres", psqlInfo)
-	db.LogMode(true)
-
-	if err != nil {
-		panic(err)
-	}
-	var user User
+	db := utils.GetDatabaseConnection()
+	var user models.User
 	db.First(&user, 1)
 	log.Fatal(user.Name)
-	defer db.Close()
-
 	routes.RegisterRoutes()
 }
