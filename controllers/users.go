@@ -11,7 +11,7 @@ import (
 // ShowRegisterForm function to show the form
 func ShowRegisterForm() *View {
     return &View{
-        NewView: views.NewView("layout", "resources/views/auth/register.gohtml"),
+        NewView: views.NewView("layout", "auth/register"),
     }
 }
 

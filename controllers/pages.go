@@ -9,21 +9,21 @@ import (
 // ShowHomePage function to show the page.
 func ShowHomePage() *Pages {
     return &Pages{
-        NewView: views.NewView("layout", "resources/views/home.gohtml"),
+        NewView: views.NewView("layout", "home"),
     }
 }
 
 //ShowContactPage function is used to show the contact page.
 func ShowContactPage() *Pages {
     return &Pages{
-        NewView: views.NewView("layout", "resources/views/contact.gohtml"),
+        NewView: views.NewView("layout", "contact"),
     }
 }
 
 // Show404Page function is used to be shown whenever the route isn't found.
 func Show404Page() *Pages {
     return &Pages{
-        NewView: views.NewView("layout", "resources/views/404.gohtml"),
+        NewView: views.NewView("layout", "404"),
     }
 }
 
