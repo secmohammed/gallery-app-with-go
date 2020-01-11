@@ -1,17 +1,24 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
+	"log"
 
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/joho/godotenv/autoload"
-	_ "github.com/lib/pq"
-
 	"lenslocked.com/config"
 	"lenslocked.com/routes"
 )
 
 var databaseCredentials = config.GetDatabase()
+
+// User type
+type User struct {
+	ID    int
+	Name  string
+	Email string `gorm:"type:varchar(100);unique_index"`
+}
 
 func main() {
 
@@ -22,15 +29,16 @@ func main() {
 		databaseCredentials["password"],
 		databaseCredentials["database"],
 	)
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := gorm.Open("postgres", psqlInfo)
+	db.LogMode(true)
+
 	if err != nil {
 		panic(err)
 	}
+	var user User
+	db.First(&user, 1)
+	log.Fatal(user.Name)
 	defer db.Close()
-
-	if err := db.Ping(); err != nil {
-		panic(err)
-	}
 
 	routes.RegisterRoutes()
 }
