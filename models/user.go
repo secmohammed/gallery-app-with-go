@@ -66,7 +66,22 @@ func Delete(id uint) error {
     return db.Delete(&user).Error
 }
 
-// ByEail function will lok up the users using the given email.
+// Login function is used to authorize user throughout his credentials.
+func Login(user *User) (*User, error) {
+    authenticatedUser, err := ByEmail(user.Email)
+
+    if err != nil {
+        panic(err)
+    }
+    err = bcrypt.CompareHashAndPassword([]byte(authenticatedUser.Password), []byte(user.Password))
+    if err != nil {
+        // user is logged in
+        return nil, err
+    }
+    panic("User supplied invalid credentials")
+}
+
+// ByEmail function will lok up the users using the given email.
 func ByEmail(email string) (*User, error) {
     var user User
     query := db.Where(&user, "email = ?", email)

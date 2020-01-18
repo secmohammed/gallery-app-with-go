@@ -9,6 +9,13 @@ import (
     "lenslocked.com/utils"
 )
 
+// ShowLoginForm function is used to show the login form.
+func ShowLoginForm() *View {
+    return &View{
+        NewView: views.NewView("auth/login"),
+    }
+}
+
 // ShowRegisterForm function to show the form
 func ShowRegisterForm() *View {
     return &View{
@@ -16,11 +23,32 @@ func ShowRegisterForm() *View {
     }
 }
 
+//LoginFormRequest type.
+type LoginFormRequest struct {
+    Email    string `schema:"email"`
+    Password string `schema:"password"`
+}
+
 // RegisterFormRequest type.
 type RegisterFormRequest struct {
     Name     string `schema:"name"`
     Email    string `schema:"email"`
     Password string `schema:"password"`
+}
+
+//ParseLoginForm to parse the login form when submitted.
+func ParseLoginForm(w http.ResponseWriter, r *http.Request) {
+    form := LoginFormRequest{}
+    utils.Must(utils.ParseForm(r, &form))
+    // user := models.User{
+    //     Email:    form.Email,
+    //     Password: form.Password,
+    // }
+    fmt.Fprintln(w, form)
+    // if user, err := models.Login(&user); err != nil {
+    //     return
+    // }
+    // log.Fatal(user)
 }
 
 //ParseRegisterForm to parse the registration form when submitted.
