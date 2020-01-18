@@ -13,12 +13,13 @@ func RegisterRoutes() {
     router.NotFoundHandler = http.HandlerFunc(controllers.Show404Page().Render)
     router.HandleFunc("/", controllers.ShowHomePage().Render)
     router.HandleFunc("/contact", controllers.ShowContactPage().Render)
+    router.HandleFunc("/cookietest", controllers.ShowUserCookie).Methods("GET")
     // auth routes.
     auth := router.PathPrefix("/auth").Subrouter()
     auth.HandleFunc("/register", controllers.ParseRegisterForm).Methods("POST")
     auth.HandleFunc("/login", controllers.ParseLoginForm).Methods("POST")
     auth.HandleFunc("/login", controllers.ShowLoginForm().Render).Methods("GET")
-    auth.HandleFunc("/login", controllers.ShowRegisterForm().Render).Methods("GET")
+    auth.HandleFunc("/register", controllers.ShowRegisterForm().Render).Methods("GET")
     http.ListenAndServe(":3000", router)
 
 }

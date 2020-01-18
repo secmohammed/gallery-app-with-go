@@ -5,12 +5,14 @@ import (
     "lenslocked.com/utils"
 )
 
+var database = utils.GetDatabaseConnection()
+
 func init() {
-    utils.GetDatabaseConnection().AutoMigrate(models.User{})
+    database.AutoMigrate(models.User{})
 }
 
-//refresh function is used to take the tables down form the database and refresh it
+//Refresh function is used to take the tables down form the database and refresh it
 func Refresh() {
-    utils.GetDatabaseConnection().DropTableIfExists(&models.User{})
-    utils.GetDatabaseConnection().AutoMigrate(&models.User{})
+    database.DropTableIfExists(&models.User{})
+    database.AutoMigrate(&models.User{})
 }

@@ -16,6 +16,16 @@ func ShowLoginForm() *View {
     }
 }
 
+//ShowUserCookie function is useed to show the cookies of authenticated user.
+func ShowUserCookie(w http.ResponseWriter, r *http.Request) {
+    cookie, err := r.Cookie("email")
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    fmt.Fprintln(w, "Email is:", cookie.Value)
+}
+
 // ShowRegisterForm function to show the form
 func ShowRegisterForm() *View {
     return &View{
@@ -53,12 +63,15 @@ func ParseLoginForm(w http.ResponseWriter, r *http.Request) {
         }
 
     }
-    cookie := http.Cookie{
+    writeCookieforUser(w, user)
+    http.Redirect(w, r, "/cookietest", http.StatusFound)
+}
+
+func writeCookieforUser(w http.ResponseWriter, user *models.User) {
+    http.SetCookie(w, &http.Cookie{
         Name:  "email",
         Value: user.Email,
-    }
-    http.SetCookie(w, &cookie)
-    fmt.Fprintln(w, user)
+    })
 }
 
 //ParseRegisterForm to parse the registration form when submitted.
@@ -75,7 +88,8 @@ func ParseRegisterForm(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
-    fmt.Fprintln(w, user)
+    writeCookieforUser(w, &user)
+    http.Redirect(w, r, "/cookietest", http.StatusFound)
 }
 
 // View type.
