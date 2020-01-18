@@ -42,17 +42,18 @@ func ParseLoginForm(w http.ResponseWriter, r *http.Request) {
     utils.Must(utils.ParseForm(r, &form))
 
     user, err := models.Authenticate(form.Email, form.Password)
-    switch err {
-    case models.ErrorNotFound:
-        fmt.Fprintln(w, "Invalid Email address")
-    case models.ErrorInvalidPassword:
-        fmt.Fprint(w, "Invalid password provided.")
-    case nil:
-        fmt.Fprintln(w, user)
-    default:
-        http.Error(w, err.Error(), http.StatusInternalServerError)
+    if err != nil {
+        switch err {
+        case models.ErrorNotFound:
+            fmt.Fprintln(w, "Invalid Email address")
+        case models.ErrorInvalidPassword:
+            fmt.Fprint(w, "Invalid password provided.")
+        default:
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+        }
+
     }
-    fmt.Fprintln(w, form)
+    fmt.Fprintln(w, user)
 }
 
 //ParseRegisterForm to parse the registration form when submitted.
