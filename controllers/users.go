@@ -38,17 +38,21 @@ type RegisterFormRequest struct {
 
 //ParseLoginForm to parse the login form when submitted.
 func ParseLoginForm(w http.ResponseWriter, r *http.Request) {
-    form := LoginFormRequest{}
+    var form LoginFormRequest
     utils.Must(utils.ParseForm(r, &form))
-    // user := models.User{
-    //     Email:    form.Email,
-    //     Password: form.Password,
-    // }
+
+    user, err := models.Authenticate(form.Email, form.Password)
+    switch err {
+    case models.ErrorNotFound:
+        fmt.Fprintln(w, "Invalid Email address")
+    case models.ErrorInvalidPassword:
+        fmt.Fprint(w, "Invalid password provided.")
+    case nil:
+        fmt.Fprintln(w, user)
+    default:
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
     fmt.Fprintln(w, form)
-    // if user, err := models.Login(&user); err != nil {
-    //     return
-    // }
-    // log.Fatal(user)
 }
 
 //ParseRegisterForm to parse the registration form when submitted.

@@ -18,6 +18,7 @@ func RegisterRoutes() {
     auth.HandleFunc("/register", controllers.ParseRegisterForm).Methods("POST")
     auth.HandleFunc("/login", controllers.ParseLoginForm).Methods("POST")
     auth.HandleFunc("/login", controllers.ShowLoginForm().Render).Methods("GET")
+    auth.HandleFunc("/login", controllers.ShowRegisterForm().Render).Methods("GET")
     http.ListenAndServe(":3000", router)
 
 }

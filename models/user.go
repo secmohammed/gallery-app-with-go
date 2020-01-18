@@ -20,6 +20,9 @@ var ErrorNotFound = errors.New("model: resource not found")
 //ErrorInvaildID will be thrown in case of the id is invalid or equal to zero.
 var ErrorInvaildID = errors.New("models: ID provided was invalid")
 
+//ErrorInvalidPassword will be thrown in case of password mismatch
+var ErrorInvalidPassword = errors.New("models: Incorrect password provided.")
+
 // User type
 type User struct {
     gorm.Model
@@ -66,19 +69,22 @@ func Delete(id uint) error {
     return db.Delete(&user).Error
 }
 
-// Login function is used to authorize user throughout his credentials.
-func Login(user *User) (*User, error) {
-    authenticatedUser, err := ByEmail(user.Email)
-
+// Authenticate function is used to authorize user throughout his credentials.
+func Authenticate(email, password string) (*User, error) {
+    user, err := ByEmail(email)
     if err != nil {
-        panic(err)
-    }
-    err = bcrypt.CompareHashAndPassword([]byte(authenticatedUser.Password), []byte(user.Password))
-    if err != nil {
-        // user is logged in
         return nil, err
     }
-    panic("User supplied invalid credentials")
+    err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+    if err != nil {
+        switch err {
+        case bcrypt.ErrMismatchedHashAndPassword:
+            return nil, ErrorInvalidPassword
+        default:
+            return nil, err
+        }
+    }
+    return user, nil
 }
 
 // ByEmail function will lok up the users using the given email.
