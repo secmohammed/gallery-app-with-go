@@ -17,7 +17,6 @@ func RegisterRoutes() {
     auth := router.PathPrefix("/auth").Subrouter()
     auth.HandleFunc("/register", controllers.ParseRegisterForm).Methods("POST")
     auth.HandleFunc("/register", controllers.ShowRegisterForm().Render).Methods("GET")
-
     http.ListenAndServe(":3000", router)
 
 }
