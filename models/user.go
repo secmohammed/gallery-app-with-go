@@ -11,17 +11,19 @@ import (
     _ "lenslocked.com/utils"
 )
 
-// db variable to get the database connection.
-var db *gorm.DB = utils.GetDatabaseConnection()
+var (
+    // db variable to get the database connection.
+    db *gorm.DB = utils.GetDatabaseConnection()
 
-// ErrorNotFound is returned when a resource cannot be found.
-var ErrorNotFound = errors.New("model: resource not found")
+    // ErrorNotFound is returned when a resource cannot be found.
+    ErrorNotFound = errors.New("model: resource not found")
 
-//ErrorInvaildID will be thrown in case of the id is invalid or equal to zero.
-var ErrorInvaildID = errors.New("models: ID provided was invalid")
+    //ErrorInvaildID will be thrown in case of the id is invalid or equal to zero.
+    ErrorInvaildID = errors.New("models: ID provided was invalid")
 
-//ErrorInvalidPassword will be thrown in case of password mismatch
-var ErrorInvalidPassword = errors.New("models: Incorrect password provided.")
+    //ErrorInvalidPassword will be thrown in case of password mismatch
+    ErrorInvalidPassword = errors.New("models: Incorrect password provided.")
+)
 
 // User type
 type User struct {

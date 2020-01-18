@@ -53,6 +53,11 @@ func ParseLoginForm(w http.ResponseWriter, r *http.Request) {
         }
 
     }
+    cookie := http.Cookie{
+        Name:  "email",
+        Value: user.Email,
+    }
+    http.SetCookie(w, &cookie)
     fmt.Fprintln(w, user)
 }
 
