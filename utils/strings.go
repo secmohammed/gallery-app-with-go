@@ -19,10 +19,10 @@ func GenerateBytes(n int) ([]byte, error) {
     return b, nil
 }
 
-//GnerateString function is used to generate a byte slic of siz nBytes and
+//GenerateString function is used to generate a byte slic of siz nBytes and
 //then it will return a string that's the base64 url encoded version.
 //of that byte slice.
-func GnerateString(nBytes int) (string, error) {
+func GenerateString(nBytes int) (string, error) {
     b, err := GenerateBytes(nBytes)
     if err != nil {
         return "", err
@@ -32,5 +32,5 @@ func GnerateString(nBytes int) (string, error) {
 
 //RememberToken function is used to generate a string using the remember token bytes.
 func RememberToken() (string, error) {
-    return GnerateString(RememberTokenBytes)
+    return GenerateString(RememberTokenBytes)
 }

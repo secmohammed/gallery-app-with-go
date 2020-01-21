@@ -2,6 +2,7 @@ package models
 
 import (
     "errors"
+    "os"
 
     "github.com/jinzhu/gorm"
     "golang.org/x/crypto/bcrypt"
@@ -14,6 +15,10 @@ import (
 var (
     // db variable to get the database connection.
     db *gorm.DB = utils.GetDatabaseConnection()
+    //HmacSecretKey is a variable that defines the secret key needed for hmac
+    HmacSecretKey = os.Getenv("HMAC_SECRET_KEY")
+    //hmac variable to get the hmac hash we created
+    hmac = utils.NewHMAC(HmacSecretKey)
 
     // ErrorNotFound is returned when a resource cannot be found.
     ErrorNotFound = errors.New("model: resource not found")
@@ -22,15 +27,16 @@ var (
     ErrorInvaildID = errors.New("models: ID provided was invalid")
 
     //ErrorInvalidPassword will be thrown in case of password mismatch
-    ErrorInvalidPassword = errors.New("models: Incorrect password provided.")
+    ErrorInvalidPassword = errors.New("models: incorrect password provided")
 )
 
 // User type
 type User struct {
     gorm.Model
-    Name     string
-    Email    string `gorm:"not null;type:varchar(100);unique_index"`
-    Password string `gorm:"not null;type:varchar(100);"`
+    Name          string
+    Email         string `gorm:"not null;type:varchar(100);unique_index"`
+    Password      string `gorm:"not null;type:varchar(100);"`
+    RememberToken string `gorm:"nullable;unique_index"`
 }
 
 //Create function is used to create a users record
@@ -40,12 +46,36 @@ func Create(user *User) error {
         return err
     }
     user.Password = string(hashedBytes)
+    generateRememberTokenFor(user)
     return db.Create(user).Error
+}
+func generateRememberTokenFor(user *User) *User {
+    if user.RememberToken == "" {
+        token, err := utils.RememberToken()
+        if err != nil {
+            panic(err)
+        }
+        user.RememberToken = token
+    }
+    user.RememberToken = hmac.Hash(user.RememberToken)
+    return user
 }
 
 // Update will update the provided user with all of the data passed through the user object.
 func Update(user *User) error {
+    generateRememberTokenFor(user)
     return db.Save(user).Error
+}
+
+//ByRememberToken function is used to fetch the user by the provided token.
+func ByRememberToken(token string) (*User, error) {
+    var user User
+    hashedToken := hmac.Hash(token)
+    err := first(db.Where("remember_token = ?", hashedToken), &user)
+    if err != nil {
+        return nil, err
+    }
+    return &user, nil
 }
 
 // ByID will look up the users using the given id.
