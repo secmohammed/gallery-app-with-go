@@ -3,6 +3,7 @@ package controllers
 import (
     "fmt"
     "net/http"
+    "time"
 
     "lenslocked.com/models"
     "lenslocked.com/resources/views"
@@ -18,12 +19,18 @@ func ShowLoginForm() *View {
 
 //ShowUserCookie function is useed to show the cookies of authenticated user.
 func ShowUserCookie(w http.ResponseWriter, r *http.Request) {
-    cookie, err := r.Cookie("email")
+    cookie, err := r.Cookie("remember_token")
+    fmt.Println(cookie)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
-    fmt.Fprintln(w, "Email is:", cookie.Value)
+    user, err := models.ByRememberToken(cookie.Value)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    fmt.Fprintln(w, user)
 }
 
 // ShowRegisterForm function to show the form
@@ -56,22 +63,47 @@ func ParseLoginForm(w http.ResponseWriter, r *http.Request) {
         switch err {
         case models.ErrorNotFound:
             fmt.Fprintln(w, "Invalid Email address")
+            break
         case models.ErrorInvalidPassword:
-            fmt.Fprint(w, "Invalid password provided.")
+            fmt.Fprintln(w, "Invalid password provided.")
+            break
         default:
-            http.Error(w, err.Error(), http.StatusInternalServerError)
+            fmt.Fprint(w, err.Error())
+            break
         }
-
+        return
     }
-    writeCookieforUser(w, user)
+    err = writeCookieforUser(w, user)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
     http.Redirect(w, r, "/cookietest", http.StatusFound)
 }
 
-func writeCookieforUser(w http.ResponseWriter, user *models.User) {
+func writeCookieforUser(w http.ResponseWriter, user *models.User) error {
+    if user.RememberToken == "" {
+        token, err := utils.RememberToken()
+        if err != nil {
+            return err
+        }
+        user.RememberToken = token
+        err = models.Update(user)
+        if err != nil {
+            return err
+        }
+    }
+    expirationTime := time.Now().Add(time.Hour)
+
     http.SetCookie(w, &http.Cookie{
-        Name:  "email",
-        Value: user.Email,
+        Name:     "remember_token",
+        Value:    user.RememberToken,
+        Expires:  expirationTime,
+        HttpOnly: true,
+        Secure:   false,
+        Path:     "/",
     })
+    return nil
 }
 
 //ParseRegisterForm to parse the registration form when submitted.
@@ -88,7 +120,11 @@ func ParseRegisterForm(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
-    writeCookieforUser(w, &user)
+    err := writeCookieforUser(w, &user)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
     http.Redirect(w, r, "/cookietest", http.StatusFound)
 }
 

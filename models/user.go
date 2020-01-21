@@ -46,32 +46,37 @@ func Create(user *User) error {
         return err
     }
     user.Password = string(hashedBytes)
-    generateRememberTokenFor(user)
+    user, err = generateRememberTokenFor(user)
+    if err != nil {
+        return err
+    }
     return db.Create(user).Error
 }
-func generateRememberTokenFor(user *User) *User {
+func generateRememberTokenFor(user *User) (*User, error) {
     if user.RememberToken == "" {
         token, err := utils.RememberToken()
         if err != nil {
-            panic(err)
+            return nil, err
         }
         user.RememberToken = token
     }
     user.RememberToken = hmac.Hash(user.RememberToken)
-    return user
+    return user, nil
 }
 
 // Update will update the provided user with all of the data passed through the user object.
 func Update(user *User) error {
-    generateRememberTokenFor(user)
+    user, err := generateRememberTokenFor(user)
+    if err != nil {
+        return err
+    }
     return db.Save(user).Error
 }
 
 //ByRememberToken function is used to fetch the user by the provided token.
 func ByRememberToken(token string) (*User, error) {
     var user User
-    hashedToken := hmac.Hash(token)
-    err := first(db.Where("remember_token = ?", hashedToken), &user)
+    err := first(db.Where("remember_token = ?", token), &user)
     if err != nil {
         return nil, err
     }

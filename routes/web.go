@@ -1,7 +1,9 @@
 package routes
 
 import (
+    "fmt"
     "net/http"
+    "os"
 
     "github.com/gorilla/mux"
     "lenslocked.com/controllers"
@@ -20,6 +22,6 @@ func RegisterRoutes() {
     auth.HandleFunc("/login", controllers.ParseLoginForm).Methods("POST")
     auth.HandleFunc("/login", controllers.ShowLoginForm().Render).Methods("GET")
     auth.HandleFunc("/register", controllers.ShowRegisterForm().Render).Methods("GET")
-    http.ListenAndServe(":3000", router)
+    http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("APP_PORT")), router)
 
 }
